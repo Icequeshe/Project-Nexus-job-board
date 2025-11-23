@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Job } from "../types/job.ts";
-
+import type { Job } from '../types/job';
 interface JobContextType {
   jobs: Job[];
   setJobs: (jobs: Job[]) => void;
