@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import JobDetails from "./pages/JobDetails";
-import ApplyForm from "./pages/ApplyForm";
+import ApplyForm from "./components/ApplyForm";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 
