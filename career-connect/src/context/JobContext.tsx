@@ -3,19 +3,25 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import type { Job } from "../types/job";
 
 interface JobContextType {
-  jobs: Job[];
+  jobs: Job[]; 
   loading: boolean;
   error: string | null;
+  filterText: string;
+  setFilterText: (text: string) => void;
 }
 
 const JobContext = createContext<JobContextType>({
   jobs: [],
   loading: false,
   error: null,
+  filterText: "",
+  setFilterText: () => {}, 
 });
 
 export const JobProvider = ({ children }: { children: ReactNode }) => {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [allJobs, setAllJobs] = useState<Job[]>([]); 
+  const [filterText, setFilterText] = useState(""); 
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +52,9 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
           experienceLevel: job.job_required_experience?.experience_level || "N/A",
         }));
 
-        setJobs(formattedJobs);
+        setAllJobs(formattedJobs);
+        setError(null); 
+
       } catch (err: any) {
         setError(err.message || "Failed to fetch jobs");
       } finally {
@@ -57,7 +65,24 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
     fetchJobs();
   }, [API_URL, API_KEY, API_HOST]);
 
-  return <JobContext.Provider value={{ jobs, loading, error }}>{children}</JobContext.Provider>;
+  const jobs = allJobs.filter((job) => {
+    const lowerCaseFilter = filterText.toLowerCase();
+    return job.title.toLowerCase().includes(lowerCaseFilter);
+  });
+
+  return (
+    <JobContext.Provider 
+      value={{ 
+        jobs, 
+        loading, 
+        error,
+        filterText, 
+        setFilterText 
+      }}
+    >
+      {children}
+    </JobContext.Provider>
+  );
 };
 
 export const useJobs = () => useContext(JobContext);
