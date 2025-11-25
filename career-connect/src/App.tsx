@@ -1,25 +1,30 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { JobProvider } from "./context/JobContext";
 import Home from "./pages/Home";
 import JobDetails from "./pages/JobDetails";
-import ApplyForm from "./components/ApplyForm";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
+import About from "./pages/About"; //
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <JobProvider> 
 
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/job/:id" element={<JobDetails />} />
-          <Route path="/apply/:id" element={<ApplyForm />} />
-        </Routes>
-      </main>
+        <div className="flex flex-col min-h-screen">
+          <Header />
 
-      <Footer />
-    </div>
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/jobs/:id" element={<JobDetails />} />
+              <Route path="*" element={<p className="text-center mt-20 text-xl">404: Page Not Found</p>} />
+            </Routes>
+          </main>
+
+          <Footer />
+        </div>
+     
+    </JobProvider>
   );
 }
 

@@ -1,64 +1,65 @@
-import { useState, useEffect } from "react";
-import { useJobs } from "../context/JobContext";
+import { useJobs } from '/src/context/JobContext.tsx';
 import JobCard from "../components/JobCard";
-import JobFilter from "../components/JobFilter";
-import type { Job } from "../types/job";
+import SearchBar from "../components/SearchBar";
+import JobFilters from "../components/JobFilters";
+import Loader from "../components/Loader";
 
 const Home = () => {
-  const { jobs, loading, error } = useJobs();
+    const { 
+        filteredJobs, 
+        loading, 
+        error, 
+        setFilterText, 
+        categoryFilter,
+        locationFilter,
+        experienceFilter,
+        setCategoryFilter,
+        setLocationFilter,
+        setExperienceFilter
+    } = useJobs();
 
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [experience, setExperience] = useState("");
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+    return (
+      <div className="px-6 py-10 max-w-7xl mx-auto">
 
-  useEffect(() => {
-    let result = jobs;
+        <h1 className="text-4xl font-extrabold mb-8 text-gray-800">Career Connect: Latest Job Opportunities</h1>
+        
+        <div className="flex flex-col md:flex-row md:gap-8">
+            
+            {/* The sidebar wrapper with sticky classes removed */}
+            <div className="md:w-1/4 mb-6 md:mb-0"> 
+                <h2 className="text-xl font-semibold mb-3 text-gray-700">Filter Jobs</h2>
+                <SearchBar onSearch={(query) => setFilterText(query)} />
+                <div className="mt-4 p-4 border rounded-lg bg-gray-50">
+                    <JobFilters
+                        onLocationChange={setLocationFilter}
+                        onExperienceChange={setExperienceFilter}
+                        onCategoryChange={setCategoryFilter}
+                        currentCategory={categoryFilter}
+                        currentLocation={locationFilter}
+                        currentExperience={experienceFilter}
+                    />
+                </div>
+            </div>
 
-    if (category) {
-      result = result.filter((job) =>
-        job.category?.toLowerCase().includes(category.toLowerCase())
-      );
-    }
-    if (location) {
-      result = result.filter((job) =>
-        job.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-    if (experience) {
-      result = result.filter((job) => job.experienceLevel === experience);
-    }
+            <div className="md:w-3/4">
+                {loading && <div className="text-center py-10"><Loader /></div>}
+                {error && <div className="text-center py-10 text-red-600 font-semibold border border-red-200 bg-red-50 p-4 rounded-md">Error fetching jobs: {error}</div>}
 
-    setFilteredJobs(result);
-  }, [category, location, experience, jobs]);
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {!loading && !error && filteredJobs.length === 0 && (
+                        <p className="text-gray-600 col-span-full text-center py-10 text-lg">
+                            No jobs found matching your criteria. Try adjusting your filters.
+                        </p>
+                    )}
 
-  if (loading) return <p className="text-center mt-10">Loading jobs...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
-
-  return (
-    <div className="px-6 py-10">
-      <h1 className="text-3xl font-bold mb-6">Latest Jobs</h1>
-
-      <JobFilter
-        category={category}
-        location={location}
-        experience={experience}
-        setCategory={setCategory}
-        setLocation={setLocation}
-        setExperience={setExperience}
-      />
-
-      {filteredJobs.length === 0 ? (
-        <p>No jobs found.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
+                    {filteredJobs.map((job) => (
+                        <JobCard key={job.id} job={job} />
+                    ))}
+                </div>
+            </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
 };
 
 export default Home;
